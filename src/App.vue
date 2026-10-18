@@ -1,0 +1,167 @@
+<script setup>
+import { computed, onMounted, onUnmounted, ref } from "vue";
+
+const annualEstimate = 8_000_000;
+const estimate = ref(0);
+const numberFormatter = new Intl.NumberFormat("es-ES");
+let timerId;
+
+const formattedEstimate = computed(() => numberFormatter.format(estimate.value));
+
+const facts = [
+  {
+    number: "8+ millones",
+    title: "de vidas cada año",
+    description: "La OMS estima que el tabaco causa más de ocho millones de muertes anuales en el mundo.",
+  },
+  {
+    number: "1,3 millones",
+    title: "sin haber fumado",
+    description: "Personas no fumadoras mueren cada año por exposición al humo ajeno, según estimaciones de la OMS.",
+  },
+  {
+    number: "No hay nivel seguro",
+    title: "de exposición al humo",
+    description: "El humo de segunda mano también daña la salud. Mantener los espacios libres de humo protege a todos.",
+  },
+];
+
+const steps = [
+  {
+    title: "Habla con alguien de confianza",
+    description: "Cuéntale a una persona cercana que quieres dejarlo y pídele que te acompañe.",
+  },
+  {
+    title: "Consulta a un profesional de salud",
+    description: "Un médico, enfermera o farmacéutico puede orientarte sobre opciones y apoyo adecuados para ti.",
+  },
+  {
+    title: "Si vuelves a fumar, vuelve a intentarlo",
+    description: "Un tropiezo no borra lo avanzado. Aprende de lo ocurrido y pide ayuda para el siguiente paso.",
+  },
+];
+
+function updateEstimate() {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+  const startOfNextYear = new Date(now.getFullYear() + 1, 0, 1).getTime();
+  const yearProgress = (now.getTime() - startOfYear) / (startOfNextYear - startOfYear);
+  estimate.value = Math.floor(annualEstimate * yearProgress);
+}
+
+onMounted(() => {
+  updateEstimate();
+  timerId = window.setInterval(updateEstimate, 1000);
+});
+
+onUnmounted(() => {
+  window.clearInterval(timerId);
+});
+</script>
+
+<template>
+  <header class="wrap topbar">
+    <a class="brand" href="#" aria-label="Respira libre, inicio">
+      <span class="brand-mark" aria-hidden="true">↗</span>
+      <span>respira libre</span>
+    </a>
+    <nav class="nav" aria-label="Navegación principal">
+      <a href="#realidad">La realidad</a>
+      <a href="#ayuda">Cómo dejarlo</a>
+      <a class="nav-cta" href="#ayuda">Pide apoyo <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div>
+        <span class="eyebrow">Una elección que importa</span>
+        <h1 id="hero-title">El tabaco no te da más. <span>Te quita aire.</span></h1>
+        <p class="hero-copy">No hay una forma segura de consumir tabaco. Afecta a quien fuma y también a quienes respiran el humo alrededor. Informarse es el primer paso; dejarlo es posible, y no tienes que hacerlo a solas.</p>
+        <div class="actions">
+          <a class="button button-primary" href="#realidad">Conoce el impacto <span aria-hidden="true">&nbsp;↓</span></a>
+          <a class="button button-secondary" href="#ayuda">Quiero dejarlo</a>
+        </div>
+      </div>
+      <div class="visual">
+        <img class="visual-image" src="../img/aire-libre.jpg" alt="Luz del amanecer sobre un paisaje verde" fetchpriority="high">
+        <div class="visual-note">
+          <strong>Más vida.<br>Menos humo.</strong>
+          <span>Tu salud merece aire limpio.<br>Foto: Unsplash</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap counter-section" aria-labelledby="counter-title">
+      <div class="counter-card">
+        <div>
+          <p class="counter-kicker">El impacto mundial, estimado</p>
+          <h2 id="counter-title">Muertes atribuibles al tabaco este año</h2>
+          <p>Estimación orientativa calculada a partir de más de 8 millones de muertes al año, cifra comunicada por la OMS. El contador reparte ese promedio a lo largo del año: no es un registro en directo ni cuenta fallecimientos individuales.</p>
+        </div>
+        <output class="counter-number" aria-label="Estimación acumulada de muertes atribuibles al tabaco este año">{{ formattedEstimate }}</output>
+      </div>
+    </section>
+
+    <section class="section" id="realidad" aria-labelledby="reality-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">La realidad del tabaco</span>
+            <h2 id="reality-title">El humo no se queda en el cigarrillo.</h2>
+          </div>
+          <p>El consumo de tabaco es una de las principales causas evitables de enfermedad y muerte. Su impacto alcanza a familias, comunidades y personas que nunca han fumado.</p>
+        </div>
+        <div class="facts">
+          <article v-for="fact in facts" :key="fact.number" class="fact">
+            <div class="number">{{ fact.number }}</div>
+            <h3>{{ fact.title }}</h3>
+            <p>{{ fact.description }}</p>
+          </article>
+        </div>
+        <figure class="photo-break">
+          <img src="../img/naturaleza.jpg" alt="Paisaje amplio de montañas y naturaleza" loading="lazy">
+          <figcaption>Respirar aire limpio también es cuidar de quienes te rodean.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="ayuda" aria-labelledby="help-title">
+      <div class="wrap help">
+        <div>
+          <span class="eyebrow">Dejarlo es posible</span>
+          <h2 id="help-title">Un paso pequeño también cuenta.</h2>
+          <p class="help-intro">Dejar el tabaco puede costar, y pedir apoyo aumenta las posibilidades de conseguirlo. Cada intento es una oportunidad para encontrar lo que mejor te funciona.</p>
+          <figure class="help-image">
+            <img src="../img/camino.jpg" alt="Un camino entre árboles que invita a dar el siguiente paso" loading="lazy">
+            <figcaption>Tu camino empieza con un paso.</figcaption>
+          </figure>
+          <div class="actions">
+            <a class="button button-primary" href="https://www.who.int/es/news-room/fact-sheets/detail/tobacco">Guía de la OMS <span aria-hidden="true">&nbsp;↗</span></a>
+          </div>
+        </div>
+        <div class="steps">
+          <article v-for="(step, index) in steps" :key="step.title" class="step">
+            <span class="step-num">{{ String(index + 1).padStart(2, "0") }}</span>
+            <div>
+              <h3>{{ step.title }}</h3>
+              <p>{{ step.description }}</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap source-box" aria-label="Fuentes de información">
+      <p>Información basada en la ficha informativa de la Organización Mundial de la Salud. Las cifras son estimaciones globales; pueden variar según la fuente y el año.</p>
+      <a class="text-link" href="https://www.who.int/es/news-room/fact-sheets/detail/tobacco" target="_blank" rel="noopener noreferrer">Consultar fuente: OMS ↗</a>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>Respira libre — información para elegir con conocimiento.</span>
+      <span>Si necesitas ayuda para dejarlo, consulta con un profesional de salud.</span>
+    </div>
+  </footer>
+</template>
